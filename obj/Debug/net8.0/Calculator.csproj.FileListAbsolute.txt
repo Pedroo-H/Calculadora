@@ -7,6 +7,7 @@ C:\Users\pedro\Development\Calculator\obj\Debug\net8.0\Calculator.GeneratedMSBui
 C:\Users\pedro\Development\Calculator\obj\Debug\net8.0\Calculator.AssemblyInfoInputs.cache
 C:\Users\pedro\Development\Calculator\obj\Debug\net8.0\Calculator.AssemblyInfo.cs
 C:\Users\pedro\Development\Calculator\obj\Debug\net8.0\Calculator.csproj.CoreCompileInputs.cache
+C:\Users\pedro\Development\Calculator\obj\Debug\net8.0\Calculator.sourcelink.json
 C:\Users\pedro\Development\Calculator\obj\Debug\net8.0\Calculator.dll
 C:\Users\pedro\Development\Calculator\obj\Debug\net8.0\refint\Calculator.dll
 C:\Users\pedro\Development\Calculator\obj\Debug\net8.0\Calculator.pdb

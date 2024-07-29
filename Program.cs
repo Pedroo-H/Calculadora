@@ -1,122 +1,100 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using Microsoft.VisualBasic;
+﻿using Calculator.Operations;
+using Calculator.Operations.Impl;
 
 namespace Calculator
 {
     class Program
     {
+
+        private static readonly IOperation[] _OPERATIONS = [
+            new Subtraction(),
+            new Division(),
+            new Multiplication(),
+            new SquaredRoot(),
+            new Addition(),
+            new Sine(),
+            new Cosine(),
+            new Tangent()
+        ];
+
         static void Main(string[] args)
         {
-            var sum = new Operation 
+            var option = RequestOption();
+            while (option != _OPERATIONS.Length)
             {
-                Name = "Soma",
-                Apply = (n1, n2) => n1 + n2
-            };
+                var operation = _OPERATIONS[option];
+                var arguments = RequestArgumentsFor(operation);
+                var result = operation.Calculate(arguments);
 
-            var multiply = new Operation 
-            {
-                Name = "Multiplicação",
-                Apply = (n1, n2) => n1 * n2
-            };
+                Console.Clear();
+                Console.WriteLine($"O resultado da operação foi: {result}!");
+                Console.WriteLine("Aperte qualquer tecla para ir para o menu.");
 
-            var subtraction = new Operation 
-            {
-                Name = "Subtraction",
-                Apply = (n1, n2) => n1 - n2
-            };
-
-            var division = new Operation {
-                Name = "Division",
-                Apply = (n1, n2) => 
-                {
-                    if (n2 == 0) 
-                    {
-                        throw new DivideByZeroException("Não é possível fazer a divisão quando o divisor é 0!");
-                    }
-
-                    return n1/n2;
-                }
-            };
-
-            Operation[] operations = [sum, multiply, subtraction, division];
-            ShowOptions(operations);
+                Console.ReadKey();
+                option = RequestOption();
+            }
+           
+            Environment.Exit(0);
         }
 
-        private static void ShowOptions(Operation[] operations) { 
+        private static int RequestOption() { 
 
-            string input = "";
-            do 
-            {
+            int option = 0;
+            
+            var size = _OPERATIONS.Length;
+            while (option <= 0 || option > size + 1) {
                 Console.Clear();
-                var size = operations.Length;
-
                 Console.WriteLine("Qual operação deseja realizar?");
                 for (var i = 1; i <= size; i++) {
-                    Console.WriteLine($"{i} - {operations[i - 1].Name}"); 
+                    Console.WriteLine($"{i} - {_OPERATIONS[i - 1].Name}"); 
+                }
+                
+                Console.WriteLine($"{size + 1} - Sair");
+                Console.WriteLine("-------------------");
+
+                Console.WriteLine("Selecione uma opção: ");
+                _ = int.TryParse(Console.ReadLine(), out option);
+            }
+
+            return option - 1;
+        }
+
+        private static float[] RequestArgumentsFor(IOperation operation)
+        {
+            var max = operation.MaxParams;
+            var min = operation.MinParams;
+
+            List<float> values = [];
+
+            Console.Clear();
+            while (max == -1 || values.Count < max)
+            {
+                var size = values.Count;
+
+                if (size == min) // Reached minimum, can be stopped anytime.
+                {
+                    Console.WriteLine("* Caso deseje, aperte ENTER sem preencher um valor para poder calcular os valores já preenchidos!");
                 }
 
-                Console.WriteLine("-------------------");
-                Console.WriteLine("Selecione uma opção: ");
-                input = Console.ReadLine() ?? "";
-            } while (!isOptionValid(input, operations.Length));
+                var instructions = max == 1 ? "Digite o valor para calcular: " : $"Digite o {size + 1}º valor: ";
+                Console.WriteLine(instructions);
 
-            int option = int.Parse(input) - 1;
+                var success = float.TryParse(Console.ReadLine(), out float value);
+                if (!success && size >= min)
+                {
+                    break;
+                }
 
-            do 
-            {
-                Console.WriteLine("Digite o primeiro valor:");
-                input = Console.ReadLine() ?? "";
-            } while (!isValueValid(input));
+                if (!success)
+                {
+                    continue;
+                }
 
-            int value1 = int.Parse(input);
-
-            do 
-            {
-                Console.WriteLine("Digite o segundo valor:");
-                input = Console.ReadLine() ?? "";
-            } while (!isValueValid(input));
-
-            int value2 = int.Parse(input);
-
-            var result = operations[option].Apply(value1, value2);
-            Console.WriteLine($"O seu resultado é: {result}");
-
-            Console.ReadKey();
-            ShowOptions(operations);
-        }
-
-        private static bool isOptionValid(string? input, int size) 
-        {
-            if (input == null)
-                return false;
-
-            try {
-                var option = int.Parse(input);
-                return option >= 1 && option <= size;
-            } catch (Exception ignored) {
-                return false;
+                values.Add(value);
             }
-        }
 
-        private static bool isValueValid(string? input) 
-        {
-            if (input == null)
-                return false;
-
-            try {
-                float.Parse(input);
-                return true;
-            } catch (Exception ex) {
-                return false;
-            }
+            return [.. values];
         }
     }
 
-    class Operation
-    {
-        public required string Name { get; set;}
-
-        public required Func<float, float, float> Apply { get; set; }
-    }
 }
